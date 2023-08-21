@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Document</title>
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+  <link rel="stylesheet" href="/assets/css/login.css">
+  <link rel="stylesheet" href="/assets/css/style.css">
+
+
+</head>
+<body>
+<div class="container">
+  <div class="form">
+    <div class="btn">
+      <button class="signUpBtn">SIGN UP</button>
+      <button class="loginBtn">LOG IN</button>
+    </div>
+    <div class="error-area hide" id="regError"></div>
+    <form class="signUp" action="" method="get">
+      <div class="formGroup">
+        <select id="role">
+                  <option value="1">ADMIN</option>
+                  <option value="2">USER</option>
+                </select>
+      </div>
+      <div class="formGroup">
+        <input type="text" id="usernameReg" name="username" placeholder="Username">
+      </div>
+      <div class="formGroup">
+        <input type="password" id="passwordReg" name="passwordReg" placeholder="Password"/>
+      </div>
+      <div class="formGroup">
+        <input type="password" id="rePasswordReg" name="rePasswordReg" placeholder="Re Password"/>
+      </div>
+      <div class="checkBox">
+        <input type="checkbox" name="checkbox" id="checkboxUp">
+        <span class="text">I agree with term & conditions</span>
+      </div>
+      <div class="formGroup">
+        <button type="button" class="btn2" name="btn_save" id="btnRegister">SIGN UP</button>
+      </div>
+
+    </form>
+
+    <!------ Login Form -------- -->
+    <form class="login" action="" method="get">
+
+      <div class="formGroup">
+        <input type="text" id="usernameLog" name="user_email" placeholder="User Name" value="" required>
+      </div>
+      <div class="formGroup">
+        <input type="password" id="passwordLog" name="user_pass" placeholder="Password" value="" required>
+
+      </div>
+      <div class="checkBox">
+        <input type="checkbox" name="checkbox" id="checkbox">
+        <span class="text">Keep me signed in on this device</span>
+      </div>
+      <div class="formGroup">
+        <button type="button" name="btn_submit" class="btn2" id="btnLogin" >LOGIN</button>
+      </div>
+
+    </form>
+
+  </div>
+</div>
+<script src="/assets/js/login.js"></script>
+<script src="/assets/sweetalert2/v11.7.12/sweetalert2.all.min.js"></script>
+<script src="/assets/js/app.js"></script>
+
+<script>
+
+  const signIn = $('#signIn');
+  const usernameLog = $('#usernameLog');
+  const passwordLog = $('#passwordLog');
+  const btnLogin = $('#btnLogin');
+
+  const role = $('#role');
+  const usernameReg = $('#usernameReg');
+  const passwordReg = $('#passwordReg');
+  const rePasswordReg = $('#rePasswordReg');
+  const btnRegister = $('#btnRegister');
+
+  btnRegister.on('click', () => {
+    const obj = {
+      username: usernameReg.val(),
+      password: passwordReg.val(),
+      rePassword: rePasswordReg.val(),
+      roleId: role.val()
+    }
+
+    $.ajax({
+      headers: {
+        'accept': 'application/json',
+        'content-type': 'application/json'
+      },
+      type: 'POST',
+      url: 'http://localhost:28001/api/auth/register',
+      data: JSON.stringify(obj)
+    })
+            .done(() => {
+              App.showSuccessAlert('Đăng ký tài khoản thành công')
+              signIn.click();
+              usernameLog.val(usernameReg.val());
+              passwordLog.val(passwordReg.val());
+            })
+            .fail((jqXHR) => {
+              const responseJSON = jqXHR.responseJSON;
+
+              $('#regError').empty();
+              let str = '';
+
+              $.each(responseJSON, (k, v) => {
+                str += `<label for="${k}">${v}</label>`
+              })
+
+              $('#regError').append(str).removeClass('hide').addClass('show');
+
+              console.log(jqXHR);
+            })
+  })
+
+  btnLogin.on('click', () => {
+    const obj = {
+      username: usernameLog.val(),
+      password: passwordLog.val()
+    }
+
+    $.ajax({
+      headers: {
+        'accept': 'application/json',
+        'content-type': 'application/json'
+      },
+      type: 'POST',
+      url: 'http://localhost:28001/api/auth/login',
+      data: JSON.stringify(obj)
+    })
+            .done(() => {
+              App.showSuccessAlert('Đăng nhập thành công')
+              location.href = "/customers";
+            })
+            .fail((jqXHR) => {
+              console.log(jqXHR);
+            })
+  })
+
+</script>
+</body>
+
+</html>
